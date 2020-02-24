@@ -32,14 +32,21 @@ byte si;
 byte md;// modulo
 int counter=0;
 
+#define btMem A3 //Button "Memory" to ground
+#define oRel 9 // OUT relay
+#define oBuz 10 // OUT buzzer
+#define pUsh A2 // Push rot. enc. to ground
+#define rEnb A1 //Rot enc "B" to ground
+#define rEna A0 //Rot enc "A" to ground
+
 void setup() {
    lcd.begin(16, 2);
-   pinMode(A3, INPUT_PULLUP);//button "Memory" to ground
-   pinMode(A2, INPUT_PULLUP);//SW Left to ground
-   pinMode(A1, INPUT_PULLUP);//Rot enc B to ground
-   pinMode(A0, INPUT_PULLUP);//Rot enc A to ground
-   pinMode(9, OUTPUT);// OUT relay
-   pinMode(10, OUTPUT);// OUT buzzer
+   pinMode(btMem, INPUT_PULLUP);
+   pinMode(pUsh, INPUT_PULLUP);
+   pinMode(rEnb, INPUT_PULLUP);
+   pinMode(rEna, INPUT_PULLUP);
+   pinMode(oRel, OUTPUT);
+   pinMode(oBuz, OUTPUT);
    
 // welcome message
   lcd.clear();
@@ -59,7 +66,7 @@ void loop() {
   do{
   s=roTen(); 
   lcdpr();
-   }while(digitalRead(A2)==HIGH);//"Left" button
+   }while(digitalRead(pUsh)==HIGH);//Push button
   delay(10);
   counter=0;
  
@@ -71,7 +78,7 @@ void loop() {
   do{  
  zs= roTen();
  lcdpr();
- }while(digitalRead(A2)==HIGH);
+ }while(digitalRead(pUsh)==HIGH);//Push button
   delay(10);
   counter=0;
  
@@ -83,7 +90,7 @@ void loop() {
   do{ 
  m= roTen();
  lcdpr();
- }while(digitalRead(A2)==HIGH);
+ }while(digitalRead(pUsh)==HIGH);//Push button
  delay(10);
  counter=0;
  
@@ -95,7 +102,7 @@ void loop() {
   do{
   zm= roTen();
   lcdpr();
-  }while(digitalRead(A2)==HIGH);
+  }while(digitalRead(pUsh)==HIGH);//Push button
   delay(10);
   counter=0;
   
@@ -107,7 +114,7 @@ void loop() {
   do{//
   h= roTen();
   lcdpr();
-  }while(digitalRead(A2)==HIGH);
+  }while(digitalRead(pUsh)==HIGH);//Push button
   delay(10);
   counter=0;
   
@@ -119,7 +126,7 @@ void loop() {
   do{
   zh= roTen();
   lcdpr();
- }while(digitalRead(A2)==HIGH);
+ }while(digitalRead(pUsh)==HIGH);//Push button
   delay(10);
   counter=0;
   
@@ -163,13 +170,13 @@ void loop() {
   
   
   
-  while(0==digitalRead(A2));// "Start" button
-  while(1==digitalRead(A2));
+  while(0==digitalRead(pUsh));// Push button to start
+  while(1==digitalRead(pUsh));
   
   while(millis() % 1000 != 0);//sincro with Time Base
   delay(50);
   
-  digitalWrite(9,HIGH);//start timer
+  digitalWrite(oRel,HIGH);//start timer
    
  do{//decreasing time
   
@@ -214,35 +221,35 @@ void loop() {
   lcd.print(zs);
   lcd.print(s);
    
-  digitalWrite(9,LOW);//stop timer
+  digitalWrite(oRel,LOW);//stop timer
   
-   digitalWrite(10,HIGH);//beep to end
+   digitalWrite(oBuz,HIGH);//beep to end
    delay(2000);
-   digitalWrite(10,LOW);
-   }while(digitalRead(A3)==HIGH);//"Memory" button
+   digitalWrite(oBuz,LOW);
+   }while(digitalRead(btMem)==HIGH);//"Memory" button
    }}// end of loop
     
  byte roTen(){ // Rotary encoder routine 
  
- while(digitalRead(A2) &digitalRead(A1) & digitalRead(A0)==1);
+ while(digitalRead(pUsh) &digitalRead(rEnb) & digitalRead(rEna)==1);
  
- if(digitalRead(A2)==0){
+ if(digitalRead(pUsh)==0){
   return counter;
   
   }
-   switch(digitalRead(A0)) {
+   switch(digitalRead(rEna)) {
     case HIGH:
-    while(digitalRead(A0)==0);
-    while(digitalRead(A1)==0);
+    while(digitalRead(rEna)==0);
+    while(digitalRead(rEnb)==0);
     counter ++;
      counter=counter%md;
     break;
     case LOW:
-   while(digitalRead(A1)==0);
-   while(digitalRead(A0)==0);
+   while(digitalRead(rEnb)==0);
+   while(digitalRead(rEna)==0);
    counter --;
-   if(counter==-1){//left begin with md-1
-    counter=md-1;
+   if(counter==-1){
+    counter=md-1;//left begin with md-1
     } 
      counter=abs(counter)%md; 
   break;
